@@ -1,5 +1,4 @@
 const express = require('express')
-const bodyParser = require('body-parser');
 
 const app = express()
 
@@ -33,10 +32,9 @@ app.get('/hobbies', (req, res) => {
 
 // using url parameters
 app.get('/hobbies/:id', (req, res) => {
-  res.send(hobbies[req.params.id])
+  const hobbie = hobbies[req.params.id]
+  hobbie ? res.send(hobbies[req.params.id]) : res.status(404).send('<h1>hobbie not found</h1>')
 })
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/hobbies', (req, res) => {
   console.log('updating hobbies...')
