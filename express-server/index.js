@@ -1,54 +1,33 @@
 const express = require('express')
+const path = require('path')
+
+const { hobbiesRouter } = require('./routes/hobbies.router')
+const { messagesRouter } = require('./routes/messages.router')
+const { contentRouter } = require('./routes/content.router')
+const { imagesRouter } = require('./routes/image.router')
+
+const { logTime } = require('./middlewares/logTime.middleware')
 
 const app = express()
 
 const PORT = 3000
 
-const hobbies = [
-  {
-    id: 0,
-    hobbie: 'play videoGame'
-  },
-  {
-    id: 1,
-    hobbie: 'Watch anime'
-  },
-  {
-    id: 2,
-    hobbie: 'Learn Web Development'
-  },
-]
+// to use a middleware call the "app.use" and pass a fn with the "next" param alongside "req" and "res"  
+app.use(logTime)
 
-// sending any type of string will be converted to text/html
-app.get('/', (req, res) => {
-  res.send('<h1>Hello World!</h1>')
-})
+// this middleware will convert the request body to json if the content type is application/json
+app.use(express.json())
 
-app.get('/hobbies', (req, res) => {
-  res.send(hobbies)
-})
+app.use('/hobbies', hobbiesRouter)
+app.use('/', messagesRouter)
+app.use('/content', contentRouter)
 
-// using url parameters
-app.get('/hobbies/:id', (req, res) => {
-  const hobbie = hobbies[req.params.id]
-  hobbie ? res.send(hobbies[req.params.id]) : res.status(404).send('<h1>hobbie not found</h1>')
-})
+//serving an image 
+app.use('/images', imagesRouter)
 
-app.post('/hobbies', (req, res) => {
-  console.log('updating hobbies...')
-  console.log(req.body)
-  hobbies.push(req.body)
-  res.send(hobbies)
-})
-
-// sending any tyoe of object will be converted to application/json
-app.get('/content', (req, res) => {
-  res.send({
-    name: 'John',
-    age: 30
-  })
-})
+//serving a site
+app.use('/site', express.static(path.join(__dirname, 'public')))
 
 app.listen(PORT, () => {
   console.log('listening on port:', PORT)
-}) 
+})
