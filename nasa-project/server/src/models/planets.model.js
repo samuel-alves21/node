@@ -1,5 +1,7 @@
-const { parse } = require('csv-parse')
 const { createReadStream } = require('fs')
+const path = require('path')
+
+const { parse } = require('csv-parse')
 
 const isHabitable = (planet) => {
   return (planet.koi_disposition === 'CONFIRMED' && planet.koi_insol < 1.11 && planet.koi_insol > 0.36 && planet.koi_prad < 1.6)
@@ -7,10 +9,10 @@ const isHabitable = (planet) => {
 
 const planets = []
 
-const planetsLoad = () => {
+const loadPLanetsData = () => {
   return new Promise(((resolve, reject) => {
     // creating a redable stream of data 
-    createReadStream(__dirname + '/kepler_data.csv')
+    createReadStream(path.join(__dirname, '..', 'data', 'kepler_data.csv'))
     //piping the stream into the parsing fn 
     .pipe(parse({
       comment: '#',
@@ -27,10 +29,13 @@ const planetsLoad = () => {
       const habitablePlanets = planets.map((planet) => {
         return planet.kepler_name
       })
+      console.log(`${habitablePlanets.length} habitable planets found!`)
       resolve()
     })
   }))
 }
 
-
-module.exports = { planetsLoad }
+module.exports = { 
+  loadPLanetsData,
+  planets
+}
