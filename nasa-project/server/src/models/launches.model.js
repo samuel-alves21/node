@@ -27,9 +27,24 @@ function addNewLaunch(launch) {
     customers: ['Zero to Mastery', 'NASA'],
     flightNumber: latestFlightNumber
   }))
+} 
+
+function launchExists(launchId) {
+  console.log(launches.has(launchId))
+  console.log(launches)
+  return launches.has(launchId)
+}
+
+function abortLaunchById(launchId) {
+  const abortedLaunch = launches.get(launchId)
+  abortedLaunch.upcoming = false
+  abortedLaunch.success = false
+  return abortedLaunch
 }
 
 module.exports = {
   getAllLaunches,
-  addNewLaunch
+  addNewLaunch,
+  launchExists,
+  abortLaunchById
 }
