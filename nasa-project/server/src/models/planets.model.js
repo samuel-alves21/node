@@ -35,7 +35,11 @@ const loadPLanetsData = () => {
   }))
 }
 
+function getAllPlanets() {
+  return planets
+}
+
 module.exports = { 
   loadPLanetsData,
-  planets
+  getAllPlanets
 }
