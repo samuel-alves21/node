@@ -2,12 +2,13 @@ const { createReadStream } = require('fs')
 const path = require('path')
 
 const { parse } = require('csv-parse')
+const planets = require('./planets.mongo')
 
 const isHabitable = (planet) => {
   return (planet.koi_disposition === 'CONFIRMED' && planet.koi_insol < 1.11 && planet.koi_insol > 0.36 && planet.koi_prad < 1.6)
 }
 
-const planets = []
+// const planets = []
 
 const loadPLanetsData = () => {
   return new Promise(((resolve, reject) => {
@@ -18,8 +19,11 @@ const loadPLanetsData = () => {
       comment: '#',
       columns: true
     }))
-    .on('data', (data) => {
-      if (isHabitable(data)) planets.push(data)
+    .on('data', async (data) => {
+      // if (isHabitable(data)) planets.push(data)
+      await planets.create({
+        keplerName: data.kepler_name
+      })
     })
     .on('error', (error) => {
       console.log(error)
