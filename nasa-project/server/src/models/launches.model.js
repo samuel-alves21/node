@@ -64,17 +64,21 @@ async function scheduleNewLaunch(launch) {
   await saveLaunch(newLaunch)
 }
 
-function launchExists(launchId) {
-  console.log(launches.has(launchId))
-  console.log(launches)
-  return launches.has(launchId)
+async function launchExists(launchId) {
+  return await launchesDatabase.findOne({
+    flightNumber: launchId
+  })
 }
 
-function abortLaunchById(launchId) {
-  const abortedLaunch = launches.get(launchId)
-  abortedLaunch.upcoming = false
-  abortedLaunch.success = false
-  return abortedLaunch
+async function abortLaunchById(launchId) {
+  const abortedLaunch = await launchesDatabase.updateOne({
+    flightNumber: launchId
+  }, {
+    success: false,
+    upcoming: false,
+  })
+  console.log(abortedLaunch)
+  return abortedLaunch.modifiedCount === 1 && abortedLaunch.matchedCount === 1
 }
 
 module.exports = {
