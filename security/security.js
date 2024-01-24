@@ -3,6 +3,8 @@ require('dotenv').config()
 const http = require('http')
 const path = require('path')
 
+const { Strategy } = require('passport-google-oauth20') 
+const passport = require('passport')
 const express = require('express')
 const helmet = require('helmet')
 
@@ -15,6 +17,12 @@ const config = {
   CLIENT_SECRET: process.env.CLIENT_SECRET,
 }
 
+const AUTH_OPTIONS = {
+  callbackURL: '/auth/google/callback',
+  clientID: config.CLIENT_ID,
+  clientSecret: config.CLIENT_SECRET,
+}
+
 const checkLoggedIn = (req, res, next) => {
   const isLoggedIn = true
   if (isLoggedIn) {
@@ -25,13 +33,29 @@ const checkLoggedIn = (req, res, next) => {
     }) 
   }
 }
+
+const verifyCallback = (accessToken, refreshToken, profile, done) => {
+  console.log('profile', profile)
+  done(null, profile)
+}
+
+passport.use(new Strategy(AUTH_OPTIONS, verifyCallback))
  
 app.use(helmet())
+app.use(passport.initialize())
 app.use(express.static('public'))
 
-app.get('/auth/google', (req, res) => {})
+app.get('/auth/google', passport.authenticate('google', {
+  scope: ['email', 'profile']
+}))
 
-app.get('/auth/google/callback', (req, res) => {})
+app.get('/auth/google/callback', passport.authenticate('google', {
+  successRedirect: '/',
+  failureRedirect: '/failure',
+  session: false
+}), (req, res) => {
+  console.log('Google called us back!')
+}) 
  
 app.get('/auth/logout', (req, res) => {}) 
 
